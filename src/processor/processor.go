@@ -6,17 +6,32 @@ import (
 )
 
 // var COMMANDS = []string{"use", "add", "delete", "get", ""}
+type CommandResult struct {
+	success bool
+	data    *interface{}
+	err     error
+}
 
 type Processor struct {
-	DelayTicker *time.Ticker
-	QueueArray  []string
-	Queues      map[string]*models.Queue
+	DelayTicker    *time.Ticker
+	QueueArray     []string
+	Queues         map[string]*models.Queue
+	CommandChannel chan string
 }
 
 func CheckDelays(q *models.Queue) {
-	if len(q.Delayed) > 0 {
-
+	for id, job := range q.Delayed {
+		jobTime := job.CreatedAt.Add(time.Second * job.Delay)
+		if !jobTime.Before(time.Now()) {
+			q.Ready[id] = job
+			delete(q.Delayed, id)
+		}
 	}
+}
+
+func ProcessCommand(cmd string) *CommandResult {
+
+	return nil
 }
 
 func StartProcessor() (*Processor, error) {
