@@ -8,7 +8,7 @@ import (
 const DELAY_CHECK_TRESHOLD = 1
 const EXPIRE_CHECK_TRESHOLD = 1
 
-var processor Processor
+var processor *Processor
 
 // var COMMANDS = []string{"use", "add", "delete", "get", ""}
 type CommandResult struct {
@@ -56,6 +56,10 @@ func ProcessCommand(cmd string) *CommandResult {
 }
 
 func StartProcessor() (*Processor, error) {
+	if processor != nil {
+		return processor, nil
+	}
+
 	processor := Processor{}
 	// Start Delay Checking Process
 	processor.DelayTicker = time.NewTicker(DELAY_CHECK_TRESHOLD * time.Second)
