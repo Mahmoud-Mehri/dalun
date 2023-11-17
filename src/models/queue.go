@@ -2,7 +2,6 @@ package models
 
 import (
 	"sync"
-	"time"
 )
 
 type Queue struct {
@@ -30,23 +29,4 @@ func NewQueue(name string) (*Queue, error) {
 	queue.Name = name
 
 	return &queue, nil
-}
-
-func (q *Queue) AddNewJob(data []byte, delay int, expire time.Time) (*Job, error) {
-	job, err := NewJob(data, delay, expire)
-	if err != nil {
-		return nil, err
-	}
-
-	if job.Delay > 0 {
-		q.DelayLocker.Lock()
-		q.Delayed[job.Id] = job
-		q.DelayLocker.Unlock()
-	} else {
-		q.ReadyLocker.Lock()
-		q.Ready[job.Id] = job
-		q.ReadyLocker.Unlock()
-	}
-
-	return job, nil
 }
