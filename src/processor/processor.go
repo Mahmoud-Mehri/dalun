@@ -87,5 +87,13 @@ func StartProcessor() (*Processor, error) {
 		}
 	}()
 
+	// Start Command Channel
+	processor.CommandChannel = make(chan string)
+	go func() {
+		for cmd := range processor.CommandChannel {
+			go ProcessCommand(cmd)
+		}
+	}()
+
 	return &processor, nil
 }
