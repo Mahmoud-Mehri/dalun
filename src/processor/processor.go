@@ -14,6 +14,7 @@ type CommandResult struct {
 
 type Processor struct {
 	DelayTicker    *time.Ticker
+	ExpireTicker   *time.Ticker
 	QueueArray     []string
 	Queues         map[string]*models.Queue
 	CommandChannel chan string
@@ -21,10 +22,23 @@ type Processor struct {
 
 func CheckDelays(q *models.Queue) {
 	for id, job := range q.Delayed {
-		jobTime := job.CreatedAt.Add(time.Second * job.Delay)
-		if !jobTime.Before(time.Now()) {
+		readyTime := job.CreatedAt.Add(time.Second * job.Delay)
+		if !readyTime.Before(time.Now()) {
 			q.Ready[id] = job
 			delete(q.Delayed, id)
+		}
+	}
+}
+
+func CheckExpires(q *models.Queue) {
+	for id, job := range q.Ready {
+		if job.ExpireAfter == 0 {
+			continue
+		}
+
+		expireTime := job.CreatedAt.Add(time.Second * job.ExpireAfter)
+		if expireTime.Before(time.Now()) {
+			delete(q.Ready, id)
 		}
 	}
 }
@@ -44,6 +58,18 @@ func StartProcessor() (*Processor, error) {
 				q, found := p.Queues[value]
 				if found {
 					go CheckDelays(q)
+				}
+			}
+		}
+	}()
+
+	p.ExpireTicker = time.NewTicker(1 * time.Second)
+	go func() {
+		for range p.ExpireTicker.C {
+			for _, value := range p.QueueArray {
+				q, found := p.Queues[value]
+				if found {
+					go CheckExpires(q)
 				}
 			}
 		}
