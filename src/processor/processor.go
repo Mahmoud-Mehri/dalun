@@ -24,7 +24,7 @@ func StartProcessor() (*Processor, error) {
 	// Start Delay Checking Process
 	p.DelayTicker = time.NewTicker(1 * time.Second)
 	go func() {
-		for _ = range p.DelayTicker.C {
+		for range p.DelayTicker.C {
 			for _, value := range p.QueueArray {
 				q, found := p.Queues[value]
 				if found {
