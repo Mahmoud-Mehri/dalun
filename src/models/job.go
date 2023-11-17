@@ -3,18 +3,18 @@ package models
 import "time"
 
 type Job struct {
-	Id        int
-	Data      []byte
-	Delay     time.Duration
-	CreatedAt time.Time
-	ExpireAt  time.Time
+	Id          int
+	Data        []byte
+	CreatedAt   time.Time
+	Delay       time.Duration
+	ExpireAfter time.Duration
 }
 
-func NewJob(data []byte, delay int, expire time.Time) (*Job, error) {
+func NewJob(data []byte, delay int, expireAfter int) (*Job, error) {
 	job := Job{}
 	copy(job.Data, data)
-	job.Delay = time.Duration(delay * 1000000)
-	job.ExpireAt = expire
+	job.Delay = time.Duration(int(time.Second) * delay)
+	job.ExpireAfter = time.Duration(int(time.Second) * expireAfter)
 
 	return &job, nil
 }
