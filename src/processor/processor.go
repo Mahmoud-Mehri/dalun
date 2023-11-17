@@ -5,6 +5,11 @@ import (
 	"time"
 )
 
+const DELAY_CHECK_TRESHOLD = 1
+const EXPIRE_CHECK_TRESHOLD = 1
+
+var processor Processor
+
 // var COMMANDS = []string{"use", "add", "delete", "get", ""}
 type CommandResult struct {
 	success bool
@@ -20,6 +25,7 @@ type Processor struct {
 	CommandChannel chan string
 }
 
+// Checking Jobs in a Queue for reaching Delay time
 func CheckDelays(q *models.Queue) {
 	for id, job := range q.Delayed {
 		readyTime := job.CreatedAt.Add(time.Second * job.Delay)
@@ -30,6 +36,7 @@ func CheckDelays(q *models.Queue) {
 	}
 }
 
+// Checking Jobs in a Queue for Expiration
 func CheckExpires(q *models.Queue) {
 	for id, job := range q.Ready {
 		if job.ExpireAfter == 0 {
@@ -49,13 +56,13 @@ func ProcessCommand(cmd string) *CommandResult {
 }
 
 func StartProcessor() (*Processor, error) {
-	p := Processor{}
+	processor := Processor{}
 	// Start Delay Checking Process
-	p.DelayTicker = time.NewTicker(1 * time.Second)
+	processor.DelayTicker = time.NewTicker(DELAY_CHECK_TRESHOLD * time.Second)
 	go func() {
-		for range p.DelayTicker.C {
-			for _, value := range p.QueueArray {
-				q, found := p.Queues[value]
+		for range processor.DelayTicker.C {
+			for _, value := range processor.QueueArray {
+				q, found := processor.Queues[value]
 				if found {
 					go CheckDelays(q)
 				}
@@ -63,11 +70,12 @@ func StartProcessor() (*Processor, error) {
 		}
 	}()
 
-	p.ExpireTicker = time.NewTicker(1 * time.Second)
+	// Start Expiration Checking Process
+	processor.ExpireTicker = time.NewTicker(EXPIRE_CHECK_TRESHOLD * time.Second)
 	go func() {
-		for range p.ExpireTicker.C {
-			for _, value := range p.QueueArray {
-				q, found := p.Queues[value]
+		for range processor.ExpireTicker.C {
+			for _, value := range processor.QueueArray {
+				q, found := processor.Queues[value]
 				if found {
 					go CheckExpires(q)
 				}
@@ -75,5 +83,5 @@ func StartProcessor() (*Processor, error) {
 		}
 	}()
 
-	return &p, nil
+	return &processor, nil
 }
