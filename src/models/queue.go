@@ -2,7 +2,6 @@ package models
 
 import (
 	"sync"
-	"time"
 )
 
 type Queue struct {
@@ -32,8 +31,8 @@ func NewQueue(name string) (*Queue, error) {
 	return &queue, nil
 }
 
-func (q *Queue) AddNewJob(data []byte, delay int, expire time.Time) (*Job, error) {
-	job, err := NewJob(data, delay, expire)
+func (q *Queue) AddNewJob(data []byte, delay int, expireAfter int) (*Job, error) {
+	job, err := NewJob(data, delay, expireAfter)
 	if err != nil {
 		return nil, err
 	}
