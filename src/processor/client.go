@@ -30,7 +30,7 @@ func (c *Client) Start() {
 			if errorCounter >= 5 {
 				break
 			}
-			println("Error:" + err.Error())
+			println("Error: " + err.Error())
 			time.Sleep(1 * time.Second)
 			continue
 		}
