@@ -1,6 +1,12 @@
 package commands
 
+type CommandFunction func(cmd *Command) *CommandResult
+
 var COMMAND_LIST = [...]string{"add", "delete"}
+var COMMAND_FUNCTIONS = map[string]CommandFunction{
+	"add":    AddJobCommand,
+	"delete": DeleteJobCommand,
+}
 
 type CommandError struct {
 	Code    int
