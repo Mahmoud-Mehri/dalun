@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"dalun/commands"
 	"dalun/models"
 	"time"
 )
@@ -9,13 +10,6 @@ const DELAY_CHECK_TRESHOLD = 1
 const EXPIRE_CHECK_TRESHOLD = 1
 
 var processor *Processor
-
-// var COMMANDS = []string{"use", "add", "delete", "get", ""}
-type CommandResult struct {
-	success bool
-	data    *interface{}
-	err     error
-}
 
 type Processor struct {
 	DelayTicker    *time.Ticker
@@ -50,7 +44,7 @@ func CheckExpires(q *models.Queue) {
 	}
 }
 
-func ProcessCommand(cmd string) *CommandResult {
+func ProcessCommand(cmd string) *commands.CommandResult {
 
 	return nil
 }
