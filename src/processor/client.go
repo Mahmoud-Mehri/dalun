@@ -12,6 +12,20 @@ type Client struct {
 	Connection    net.Conn
 	ResultChannel chan commands.CommandResult
 	CreatedAt     time.Time
+	Running       bool
+	Stopped       bool
+}
+
+func NewClient(con net.Conn) (*Client, error) {
+	client := Client{
+		Connection:    con,
+		ResultChannel: make(chan commands.CommandResult),
+		CreatedAt:     time.Now(),
+		Running:       false,
+		Stopped:       false,
+	}
+
+	return &client, nil
 }
 
 func (c *Client) Start() {
@@ -20,17 +34,31 @@ func (c *Client) Start() {
 
 	writer := bufio.NewWriter(c.Connection)
 	textWriter := textproto.NewWriter(writer)
-	defer c.Connection.Close()
+	defer c.Close()
 
+	c.Running = true
 	var errorCounter int = 0
 	for {
+		if c.Stopped {
+			break
+		}
+
 		line, err := textReader.ReadLine()
+		if c.Stopped {
+			break
+		}
+
 		if err != nil {
 			errorCounter++
 			if errorCounter >= 5 {
 				break
 			}
 			println("Error: " + err.Error())
+
+			if c.Stopped {
+				break
+			}
+
 			time.Sleep(1 * time.Second)
 			continue
 		}
@@ -41,12 +69,33 @@ func (c *Client) Start() {
 		}
 
 		processor.CommandChannel <- cmd
+		if c.Stopped {
+			break
+		}
+
 		result := <-c.ResultChannel
+		if c.Stopped {
+			break
+		}
+
 		if result.Success {
 			textWriter.PrintfLine("", result.Data)
 		} else {
 			textWriter.PrintfLine("Error(%d):%s", result.Error.Code, result.Error.Message)
 		}
 
+	}
+}
+
+func (c *Client) Stop() {
+	if c.Running && !c.Stopped {
+		c.Stopped = true
+	}
+}
+
+func (c *Client) Close() {
+	if c.Running {
+		c.Connection.Close()
+		c.Running = false
 	}
 }
