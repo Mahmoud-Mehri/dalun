@@ -1,25 +1,24 @@
 package main
 
 import (
+	"dalun/commands"
+	"dalun/processor"
 	"fmt"
 	"net"
+	"time"
 )
 
+var clients []*processor.Client
+
 func handleConnection(con net.Conn) {
-	for {
-		buf := make([]byte, 1024)
-		len, err := con.Read(buf)
-		if err != nil {
-			println("Error on reading command")
-			break
-		}
-
+	client := processor.Client{
+		Connection:    con,
+		ResultChannel: make(chan commands.CommandResult),
+		CreatedAt:     time.Now(),
 	}
 
-	err := con.Write([]byte("ERROR"))
-	if err != nil {
-		println("Error on writing ERROR command")
-	}
+	clients = append(clients, &client)
+	go client.Start()
 }
 
 func main() {
@@ -40,6 +39,6 @@ func main() {
 			continue
 		}
 
-		go handleConnection(con)
+		handleConnection(con)
 	}
 }
