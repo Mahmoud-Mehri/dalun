@@ -16,7 +16,7 @@ type Processor struct {
 	ExpireTicker   *time.Ticker
 	QueueArray     []string
 	Queues         map[string]*models.Queue
-	CommandChannel chan string
+	CommandChannel chan commands.Command
 }
 
 // Checking Jobs in a Queue for reaching Delay time
@@ -44,7 +44,7 @@ func CheckExpires(q *models.Queue) {
 	}
 }
 
-func ProcessCommand(cmd string) *commands.CommandResult {
+func ProcessCommand(cmd *commands.Command) *commands.CommandResult {
 
 	return nil
 }
@@ -82,10 +82,10 @@ func StartProcessor() (*Processor, error) {
 	}()
 
 	// Start Command Channel
-	processor.CommandChannel = make(chan string)
+	processor.CommandChannel = make(chan commands.Command)
 	go func() {
 		for cmd := range processor.CommandChannel {
-			go ProcessCommand(cmd)
+			go ProcessCommand(&cmd)
 		}
 	}()
 
