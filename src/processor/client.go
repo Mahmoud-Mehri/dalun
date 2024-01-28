@@ -65,7 +65,7 @@ func (c *Client) Start() {
 
 		cmd := commands.Command{
 			CMD:           line,
-			ResultChannel: &c.ResultChannel,
+			ResultChannel: c.ResultChannel,
 		}
 
 		processor.CommandChannel <- cmd
