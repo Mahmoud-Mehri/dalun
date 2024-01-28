@@ -38,7 +38,7 @@ func CheckExpires(q *models.Queue) {
 		}
 
 		expireTime := job.CreatedAt.Add(time.Second * job.ExpireAfter)
-		if expireTime.Before(time.Now()) {
+		if expireTime.Before(time.Now()) || expireTime.Equal(time.Now()) {
 			delete(q.Ready, id)
 		}
 	}
