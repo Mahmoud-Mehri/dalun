@@ -79,7 +79,7 @@ func (c *Client) Start() {
 		}
 
 		if result.Success {
-			textWriter.PrintfLine("", result.Data)
+			textWriter.PrintfLine("Success - %v", result.Data)
 		} else {
 			textWriter.PrintfLine("Error(%d):%s", result.Error.Code, result.Error.Message)
 		}
@@ -95,7 +95,7 @@ func (c *Client) Stop() {
 
 func (c *Client) Close() {
 	if c.Running {
-		c.Connection.Close()
+		c.Stopped = true
 		c.Running = false
 	}
 }
