@@ -1,11 +1,16 @@
 package commands
 
-type CommandFunction func(cmd *Command) *CommandResult
+type CommandFunction func(cmd string) *CommandResult
 
-var COMMAND_LIST = [...]string{"add", "delete"}
-var COMMAND_FUNCTIONS = map[string]CommandFunction{
-	"add":    AddJobCommand,
-	"delete": DeleteJobCommand,
+var COMMAND_LIST = map[string]int{
+	"add-queue": 1,
+	"del-queue": 2,
+	"add-job":   3,
+	"del-job":   4,
+}
+var COMMAND_FUNCTIONS = map[int]CommandFunction{
+	1: AddJobCommand,
+	2: DelJobCommand,
 }
 
 type CommandError struct {
@@ -15,7 +20,7 @@ type CommandError struct {
 
 type Command struct {
 	CMD           string
-	ResultChannel *chan CommandResult
+	ResultChannel chan CommandResult
 }
 
 type CommandResult struct {
