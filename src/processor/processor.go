@@ -3,6 +3,7 @@ package processor
 import (
 	"dalun/commands"
 	"dalun/models"
+	"strings"
 	"time"
 )
 
@@ -45,6 +46,18 @@ func CheckExpires(q *models.Queue) {
 }
 
 func ProcessCommand(cmd *commands.Command) *commands.CommandResult {
+	cmdParts := strings.Split(cmd.CMD, " ")
+	commandId := commands.COMMAND_LIST[cmdParts[0]]
+	if commandId == 0 {
+		// Invalid command ...
+	}
+
+	commandFunc := commands.COMMAND_FUNCTIONS[commandId]
+	var commandResult *commands.CommandResult = nil
+	if commandFunc != nil {
+		commandResult = commandFunc(cmd.CMD)
+		cmd.ResultChannel <- *commandResult
+	}
 
 	return nil
 }
