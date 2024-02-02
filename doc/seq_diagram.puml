@@ -1,0 +1,32 @@
+@startuml flow
+actor "User" as user
+
+participant "Main Loop" as main
+
+box "Client"
+    participant "Command Reader" as cmdReader
+    participant "Result Channel" as chResult
+end box
+
+box "PROCESSOR"
+    participant "Command Channel" as chCommand
+    participant "Processor" as processor
+end box
+
+activate main
+activate chCommand
+activate processor
+
+user -> main: 1. Establishing New Connection
+activate cmdReader
+activate chResult
+
+user -> cmdReader: 2. Receiving New Command
+cmdReader -> chCommand: 3. Sending Command Through Command Channel
+
+processor <- chCommand: 4. Reading Command From Command Channel
+processor -> processor: 5. Processing Received Command
+
+processor -> chResult: 6. Sending Command's Result Through Result Channel
+
+@enduml
