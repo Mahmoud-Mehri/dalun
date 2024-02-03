@@ -1,9 +1,12 @@
 package commands
 
-import "strings"
+import (
+	"dalun/models"
+	"strings"
+)
 
-func AddJobCommand(cmd string) *CommandResult {
-	result := CommandResult{}
+func AddJobCommand(cmd string) *models.CommandResult {
+	result := models.CommandResult{}
 
 	commandParts := strings.Split(cmd, " ")
 	if commandParts[0] != "add-job" {

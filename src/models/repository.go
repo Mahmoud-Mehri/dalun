@@ -6,12 +6,14 @@ type JobRepository struct {
 }
 
 // Adding new Queue
-func (p *JobRepository) AddQueue(qname string) {
+func (p *JobRepository) AddQueue(qname string) error {
 	q := Queue{}
 	p.Queues[qname] = &q
+
+	return nil
 }
 
 // Adding new Job
-func (p *JobRepository) AddJob(qname string, job *Job) {
-
+func (p *JobRepository) AddJob(qname string, job *Job) error {
+	return nil
 }

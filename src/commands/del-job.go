@@ -1,6 +1,8 @@
 package commands
 
-func DelJobCommand(cmd string) *CommandResult {
+import "dalun/models"
+
+func DelJobCommand(cmd string) *models.CommandResult {
 
 	return nil
 }

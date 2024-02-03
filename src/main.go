@@ -1,7 +1,7 @@
 package main
 
 import (
-	"dalun/commands"
+	"dalun/models"
 	"dalun/processor"
 	"fmt"
 	"net"
@@ -13,7 +13,7 @@ var clients []*processor.Client
 func handleConnection(con net.Conn) {
 	client := processor.Client{
 		Connection:    con,
-		ResultChannel: make(chan commands.CommandResult),
+		ResultChannel: make(chan models.CommandResult),
 		CreatedAt:     time.Now(),
 	}
 

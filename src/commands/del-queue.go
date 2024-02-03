@@ -1,6 +1,8 @@
 package commands
 
-func DelQueueCommand(cmd string) *CommandResult {
+import "dalun/models"
+
+func DelQueueCommand(cmd string) *models.CommandResult {
 
 	return nil
 }

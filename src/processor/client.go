@@ -2,7 +2,7 @@ package processor
 
 import (
 	"bufio"
-	"dalun/commands"
+	"dalun/models"
 	"net"
 	"net/textproto"
 	"time"
@@ -10,7 +10,7 @@ import (
 
 type Client struct {
 	Connection    net.Conn
-	ResultChannel chan commands.CommandResult
+	ResultChannel chan models.CommandResult
 	CreatedAt     time.Time
 	Running       bool
 	Stopped       bool
@@ -19,7 +19,7 @@ type Client struct {
 func NewClient(con net.Conn) (*Client, error) {
 	client := Client{
 		Connection:    con,
-		ResultChannel: make(chan commands.CommandResult),
+		ResultChannel: make(chan models.CommandResult),
 		CreatedAt:     time.Now(),
 		Running:       false,
 		Stopped:       false,
@@ -63,7 +63,7 @@ func (c *Client) Start() {
 			continue
 		}
 
-		cmd := commands.Command{
+		cmd := models.Command{
 			CMD:           line,
 			ResultChannel: c.ResultChannel,
 		}

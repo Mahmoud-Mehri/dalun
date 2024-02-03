@@ -1,7 +1,6 @@
 package processor
 
 import (
-	"dalun/commands"
 	"dalun/models"
 	"strings"
 	"time"
@@ -16,7 +15,7 @@ type Processor struct {
 	DelayTicker    *time.Ticker
 	ExpireTicker   *time.Ticker
 	Repository     *models.JobRepository
-	CommandChannel chan commands.Command
+	CommandChannel chan models.Command
 }
 
 // Checking Jobs in a Queue for reaching Delay time
@@ -44,15 +43,15 @@ func CheckExpires(q *models.Queue) {
 	}
 }
 
-func ProcessCommand(cmd *commands.Command) {
+func ProcessCommand(cmd *models.Command) {
 	cmdParts := strings.Split(cmd.CMD, " ")
-	commandId := commands.COMMAND_LIST[cmdParts[0]]
+	commandId := COMMAND_LIST[cmdParts[0]]
 	if commandId == 0 {
 		println("Invalid command: %s", cmd.CMD)
 	}
 
-	commandFunc := commands.COMMAND_FUNCTIONS[commandId]
-	var commandResult *commands.CommandResult = nil
+	commandFunc := COMMAND_FUNCTIONS[commandId]
+	var commandResult *models.CommandResult = nil
 	if commandFunc != nil {
 		commandResult = commandFunc(cmd.CMD)
 		cmd.ResultChannel <- *commandResult
@@ -92,7 +91,7 @@ func StartProcessor(repo *models.JobRepository) (*Processor, error) {
 	}()
 
 	// Start Command Channel
-	processor.CommandChannel = make(chan commands.Command)
+	processor.CommandChannel = make(chan models.Command)
 	go func() {
 		for cmd := range processor.CommandChannel {
 			go ProcessCommand(&cmd)
