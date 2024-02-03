@@ -15,8 +15,7 @@ var processor *Processor
 type Processor struct {
 	DelayTicker    *time.Ticker
 	ExpireTicker   *time.Ticker
-	QueueArray     []string
-	Queues         map[string]*models.Queue
+	Repository     *models.JobRepository
 	CommandChannel chan commands.Command
 }
 
@@ -60,7 +59,7 @@ func ProcessCommand(cmd *commands.Command) {
 	}
 }
 
-func StartProcessor() (*Processor, error) {
+func StartProcessor(repo *models.JobRepository) (*Processor, error) {
 	if processor != nil {
 		return processor, nil
 	}
@@ -70,8 +69,8 @@ func StartProcessor() (*Processor, error) {
 	processor.DelayTicker = time.NewTicker(DELAY_CHECK_TRESHOLD * time.Second)
 	go func() {
 		for range processor.DelayTicker.C {
-			for _, value := range processor.QueueArray {
-				q, found := processor.Queues[value]
+			for _, value := range processor.Repository.QueueArray {
+				q, found := processor.Repository.Queues[value]
 				if found {
 					go CheckDelays(q)
 				}
@@ -83,8 +82,8 @@ func StartProcessor() (*Processor, error) {
 	processor.ExpireTicker = time.NewTicker(EXPIRE_CHECK_TRESHOLD * time.Second)
 	go func() {
 		for range processor.ExpireTicker.C {
-			for _, value := range processor.QueueArray {
-				q, found := processor.Queues[value]
+			for _, value := range processor.Repository.QueueArray {
+				q, found := processor.Repository.Queues[value]
 				if found {
 					go CheckExpires(q)
 				}
