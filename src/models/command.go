@@ -1,6 +1,6 @@
 package models
 
-type CommandFunction func(cmd string) *CommandResult
+type CommandFunction func(repo *JobRepository, cmd string) *CommandResult
 
 type Command struct {
 	CMD           string
