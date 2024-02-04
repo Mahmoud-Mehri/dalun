@@ -6,10 +6,10 @@ import (
 )
 
 var COMMAND_LIST = map[string]int{
-	"add-queue": 1,
-	"del-queue": 2,
-	"add-job":   3,
-	"del-job":   4,
+	"queue-add": 1,
+	"queue-del": 2,
+	"job-add":   3,
+	"job-del":   4,
 }
 var COMMAND_FUNCTIONS = map[int]models.CommandFunction{
 	1: commands.AddJobCommand,

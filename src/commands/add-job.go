@@ -9,7 +9,7 @@ func AddJobCommand(cmd string) *models.CommandResult {
 	result := models.CommandResult{}
 
 	commandParts := strings.Split(cmd, " ")
-	if commandParts[0] != "add-job" {
+	if commandParts[0] != "job-add" {
 		result.Success = false
 	}
 
