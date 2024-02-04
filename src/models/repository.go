@@ -15,7 +15,7 @@ func (repo *JobRepository) AddQueue(qname string) error {
 }
 
 // Adding new Job
-func (p *JobRepository) AddJob(qname string, job *Job) error {
+func (repo *JobRepository) AddJob(qname string, job *Job) error {
 
 	return nil
 }
