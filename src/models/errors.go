@@ -8,4 +8,5 @@ type CommandError struct {
 const (
 	ERROR_INVALID_COMMAND = 1
 	ERROR_INVALID_FORMAT  = 2
+	ERROR_INTERNAL        = 3
 )
