@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func AddJobCommand(cmd string) *models.CommandResult {
+func AddJobCommand(repo *models.JobRepository, cmd string) *models.CommandResult {
 	result := models.CommandResult{}
 
 	commandParts := strings.Split(cmd, " ")
