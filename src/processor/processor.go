@@ -45,15 +45,11 @@ func CheckExpires(q *models.Queue) {
 
 func ProcessCommand(cmd *models.Command) {
 	cmdParts := strings.Split(cmd.CMD, " ")
-	commandId := COMMAND_LIST[cmdParts[0]]
-	if commandId == 0 {
-		println("Invalid command: %s", cmd.CMD)
-	}
 
-	commandFunc := COMMAND_FUNCTIONS[commandId]
+	commandFunc := COMMAND_LIST[cmdParts[0]]
 	var commandResult *models.CommandResult = nil
 	if commandFunc != nil {
-		commandResult = commandFunc(cmd.CMD)
+		commandResult = commandFunc(nil, cmd.CMD)
 		cmd.ResultChannel <- *commandResult
 	}
 }
