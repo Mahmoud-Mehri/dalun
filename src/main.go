@@ -1,23 +1,21 @@
 package main
 
 import (
-	"dalun/models"
 	"dalun/processor"
 	"fmt"
 	"net"
-	"time"
 )
 
 var clients []*processor.Client
 
 func handleConnection(con net.Conn) {
-	client := processor.Client{
-		Connection:    con,
-		ResultChannel: make(chan models.CommandResult),
-		CreatedAt:     time.Now(),
+	client, err := processor.NewClient(con)
+	if err != nil {
+		fmt.Println("Error on creating new Client: ", err.Error())
+		return
 	}
 
-	clients = append(clients, &client)
+	clients = append(clients, client)
 	go client.Start()
 }
 
@@ -30,12 +28,14 @@ func main() {
 		return
 	}
 
+	fmt.Println("Dalun is listening on port ", PORT)
+
 	defer server.Close()
 
 	for {
 		con, err := server.Accept()
 		if err != nil {
-			println("Error on connection:\n" + err.Error())
+			fmt.Println("Error on connection:", err.Error())
 			continue
 		}
 
