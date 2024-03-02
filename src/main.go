@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dalun/models"
 	"dalun/processor"
 	"fmt"
 	"net"
@@ -8,7 +9,7 @@ import (
 
 var clients []*processor.Client
 
-func handleConnection(con net.Conn) {
+func handleConnection(con *net.Conn) {
 	client, err := processor.NewClient(con)
 	if err != nil {
 		fmt.Println("Error on creating new Client: ", err.Error())
@@ -32,6 +33,13 @@ func main() {
 
 	defer server.Close()
 
+	repo := models.JobRepository{}
+
+	err = processor.StartProcessor(&repo)
+	if err != nil {
+		fmt.Printf("Error on creating processor: %s", err.Error())
+	}
+
 	for {
 		con, err := server.Accept()
 		if err != nil {
@@ -39,6 +47,6 @@ func main() {
 			continue
 		}
 
-		handleConnection(con)
+		handleConnection(&con)
 	}
 }
