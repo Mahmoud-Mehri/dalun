@@ -2,6 +2,7 @@ package processor
 
 import (
 	"dalun/models"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -9,7 +10,7 @@ import (
 const DELAY_CHECK_TRESHOLD = 1
 const EXPIRE_CHECK_TRESHOLD = 1
 
-var processor *Processor
+var GlobalProcessor *Processor
 
 type Processor struct {
 	DelayTicker    *time.Ticker
@@ -44,28 +45,34 @@ func CheckExpires(q *models.Queue) {
 }
 
 func ProcessCommand(cmd *models.Command) {
+	fmt.Println("Processing Command")
 	cmdParts := strings.Split(cmd.CMD, " ")
 
 	commandFunc := COMMAND_LIST[cmdParts[0]]
 	var commandResult *models.CommandResult = nil
 	if commandFunc != nil {
 		commandResult = commandFunc(nil, cmd.CMD)
-		cmd.ResultChannel <- *commandResult
+		*cmd.ResultChannel <- *commandResult
 	}
 }
 
-func StartProcessor(repo *models.JobRepository) (*Processor, error) {
-	if processor != nil {
-		return processor, nil
+func StartProcessor(repo *models.JobRepository) error {
+	if GlobalProcessor != nil {
+		return nil
 	}
 
-	processor := Processor{}
+	GlobalProcessor = &Processor{
+		Repository: repo,
+	}
+
+	fmt.Println("Processor Created")
+
 	// Start Delay Checking Process
-	processor.DelayTicker = time.NewTicker(DELAY_CHECK_TRESHOLD * time.Second)
+	GlobalProcessor.DelayTicker = time.NewTicker(DELAY_CHECK_TRESHOLD * time.Second)
 	go func() {
-		for range processor.DelayTicker.C {
-			for _, value := range processor.Repository.QueueArray {
-				q, found := processor.Repository.Queues[value]
+		for range GlobalProcessor.DelayTicker.C {
+			for _, value := range GlobalProcessor.Repository.QueueArray {
+				q, found := GlobalProcessor.Repository.Queues[value]
 				if found {
 					go CheckDelays(q)
 				}
@@ -74,11 +81,11 @@ func StartProcessor(repo *models.JobRepository) (*Processor, error) {
 	}()
 
 	// Start Expiration Checking Process
-	processor.ExpireTicker = time.NewTicker(EXPIRE_CHECK_TRESHOLD * time.Second)
+	GlobalProcessor.ExpireTicker = time.NewTicker(EXPIRE_CHECK_TRESHOLD * time.Second)
 	go func() {
-		for range processor.ExpireTicker.C {
-			for _, value := range processor.Repository.QueueArray {
-				q, found := processor.Repository.Queues[value]
+		for range GlobalProcessor.ExpireTicker.C {
+			for _, value := range GlobalProcessor.Repository.QueueArray {
+				q, found := GlobalProcessor.Repository.Queues[value]
 				if found {
 					go CheckExpires(q)
 				}
@@ -86,13 +93,17 @@ func StartProcessor(repo *models.JobRepository) (*Processor, error) {
 		}
 	}()
 
+	fmt.Println("Before Command Channel")
+
 	// Start Command Channel
-	processor.CommandChannel = make(chan models.Command)
+	GlobalProcessor.CommandChannel = make(chan models.Command)
 	go func() {
-		for cmd := range processor.CommandChannel {
+		fmt.Println("Processor Channel Function")
+		for cmd := range GlobalProcessor.CommandChannel {
+			println("Command Received on Processor")
 			go ProcessCommand(&cmd)
 		}
 	}()
 
-	return &processor, nil
+	return nil
 }

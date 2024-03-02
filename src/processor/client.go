@@ -3,20 +3,21 @@ package processor
 import (
 	"bufio"
 	"dalun/models"
+	"fmt"
 	"net"
 	"net/textproto"
 	"time"
 )
 
 type Client struct {
-	Connection    net.Conn
+	Connection    *net.Conn
 	ResultChannel chan models.CommandResult
 	CreatedAt     time.Time
 	Running       bool
 	Stopped       bool
 }
 
-func NewClient(con net.Conn) (*Client, error) {
+func NewClient(con *net.Conn) (*Client, error) {
 	client := Client{
 		Connection:    con,
 		ResultChannel: make(chan models.CommandResult),
@@ -29,10 +30,10 @@ func NewClient(con net.Conn) (*Client, error) {
 }
 
 func (c *Client) Start() {
-	reader := bufio.NewReader(c.Connection)
+	reader := bufio.NewReader(*c.Connection)
 	textReader := textproto.NewReader(reader)
 
-	writer := bufio.NewWriter(c.Connection)
+	writer := bufio.NewWriter(*c.Connection)
 	textWriter := textproto.NewWriter(writer)
 	defer c.Close()
 
@@ -53,7 +54,7 @@ func (c *Client) Start() {
 			if errorCounter >= 5 {
 				break
 			}
-			println("Error: " + err.Error())
+			println("Error: ", err.Error())
 
 			if c.Stopped {
 				break
@@ -63,15 +64,24 @@ func (c *Client) Start() {
 			continue
 		}
 
+		println("New Command: ", line)
+
 		cmd := models.Command{
 			CMD:           line,
-			ResultChannel: c.ResultChannel,
+			ResultChannel: &c.ResultChannel,
 		}
 
-		processor.CommandChannel <- cmd
+		fmt.Println("Command Created")
+		if GlobalProcessor == nil {
+			fmt.Println("Command Channel is Nil")
+		}
+
+		GlobalProcessor.CommandChannel <- cmd
 		if c.Stopped {
 			break
 		}
+
+		println("After Channel")
 
 		result := <-c.ResultChannel
 		if c.Stopped {
