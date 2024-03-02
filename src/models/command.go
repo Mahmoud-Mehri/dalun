@@ -4,7 +4,7 @@ type CommandFunction func(repo *JobRepository, cmd string) *CommandResult
 
 type Command struct {
 	CMD           string
-	ResultChannel chan CommandResult
+	ResultChannel *chan CommandResult
 }
 
 type CommandResult struct {
