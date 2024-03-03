@@ -9,6 +9,6 @@ type Command struct {
 
 type CommandResult struct {
 	Success bool
-	Data    *interface{}
+	Data    string
 	Error   CommandError
 }
