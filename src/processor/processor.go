@@ -53,6 +53,8 @@ func ProcessCommand(cmd *models.Command) {
 	if commandFunc != nil {
 		commandResult = commandFunc(nil, cmd.CMD)
 		*cmd.ResultChannel <- *commandResult
+	} else {
+		println("Invalid Command!")
 	}
 }
 

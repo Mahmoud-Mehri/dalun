@@ -33,9 +33,24 @@ func (c *Client) Start() {
 	reader := bufio.NewReader(*c.Connection)
 	textReader := textproto.NewReader(reader)
 
-	writer := bufio.NewWriter(*c.Connection)
-	textWriter := textproto.NewWriter(writer)
 	defer c.Close()
+
+	go func(c *Client) {
+		writer := bufio.NewWriter(*c.Connection)
+		textWriter := textproto.NewWriter(writer)
+
+		for result := range c.ResultChannel {
+			if c.Stopped {
+				break
+			}
+
+			if result.Success {
+				textWriter.PrintfLine("Success - %v", result.Data)
+			} else {
+				textWriter.PrintfLine("Error(%d):%s", result.Error.Code, result.Error.Message)
+			}
+		}
+	}(c)
 
 	c.Running = true
 	var errorCounter int = 0
@@ -82,17 +97,6 @@ func (c *Client) Start() {
 		}
 
 		println("After Channel")
-
-		result := <-c.ResultChannel
-		if c.Stopped {
-			break
-		}
-
-		if result.Success {
-			textWriter.PrintfLine("Success - %v", result.Data)
-		} else {
-			textWriter.PrintfLine("Error(%d):%s", result.Error.Code, result.Error.Message)
-		}
 
 	}
 }
