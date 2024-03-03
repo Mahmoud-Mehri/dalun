@@ -44,14 +44,14 @@ func CheckExpires(q *models.Queue) {
 	}
 }
 
-func ProcessCommand(cmd *models.Command) {
+func ProcessCommand(repo *models.JobRepository, cmd *models.Command) {
 	fmt.Println("Processing Command")
 	cmdParts := strings.Split(cmd.CMD, " ")
 
 	commandFunc := COMMAND_LIST[cmdParts[0]]
 	var commandResult *models.CommandResult = nil
 	if commandFunc != nil {
-		commandResult = commandFunc(nil, cmd.CMD)
+		commandResult = commandFunc(repo, cmd.CMD)
 		*cmd.ResultChannel <- *commandResult
 	} else {
 		println("Invalid Command!")
@@ -103,7 +103,7 @@ func StartProcessor(repo *models.JobRepository) error {
 		fmt.Println("Processor Channel Function")
 		for cmd := range GlobalProcessor.CommandChannel {
 			println("Command Received on Processor")
-			go ProcessCommand(&cmd)
+			go ProcessCommand(repo, &cmd)
 		}
 	}()
 
