@@ -29,7 +29,7 @@ func AddQueueCommand(repo *models.JobRepository, cmd string) *models.CommandResu
 		}
 	} else {
 		result.Success = true
-		// result.Data = "Queue added successfully"
+		result.Data = queueName
 	}
 
 	return &result
