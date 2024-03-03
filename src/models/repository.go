@@ -12,8 +12,12 @@ func (repo *JobRepository) AddQueue(qname string) error {
 		return err
 	}
 
+	println("Queue Created:", qname)
+
 	repo.Queues[qname] = q
 	repo.QueueArray = append(repo.QueueArray, qname)
+
+	println("Queue Added:", qname)
 
 	return nil
 }

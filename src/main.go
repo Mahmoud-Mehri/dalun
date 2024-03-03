@@ -33,7 +33,9 @@ func main() {
 
 	defer server.Close()
 
-	repo := models.JobRepository{}
+	repo := models.JobRepository{
+		Queues: map[string]*models.Queue{},
+	}
 
 	err = processor.StartProcessor(&repo)
 	if err != nil {
