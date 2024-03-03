@@ -7,8 +7,12 @@ type JobRepository struct {
 
 // Adding new Queue
 func (repo *JobRepository) AddQueue(qname string) error {
-	q := Queue{}
-	repo.Queues[qname] = &q
+	q, err := NewQueue(qname)
+	if err != nil {
+		return err
+	}
+
+	repo.Queues[qname] = q
 	repo.QueueArray = append(repo.QueueArray, qname)
 
 	return nil
