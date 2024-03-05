@@ -44,10 +44,12 @@ func (c *Client) Start() {
 				break
 			}
 
+			textWriter.PrintfLine(result.Data)
+
 			if result.Success {
-				textWriter.PrintfLine("Success - %v", result.Data)
+				// textWriter.PrintfLine(result.Data)
 			} else {
-				textWriter.PrintfLine("Error(%d):%s", result.Error.Code, result.Error.Message)
+				// textWriter.PrintfLine("Error(%d):%s", result.Error.Code, result.Error.Message)
 			}
 		}
 	}(c)
