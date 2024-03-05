@@ -73,7 +73,8 @@ func StartProcessor(repo *models.JobRepository) error {
 	GlobalProcessor.DelayTicker = time.NewTicker(DELAY_CHECK_TRESHOLD * time.Second)
 	go func() {
 		for range GlobalProcessor.DelayTicker.C {
-			for _, value := range GlobalProcessor.Repository.QueueArray {
+			var queueNames = GlobalProcessor.Repository.GetQueueNames()
+			for _, value := range queueNames {
 				q, found := GlobalProcessor.Repository.Queues[value]
 				if found {
 					go CheckDelays(q)
@@ -86,7 +87,8 @@ func StartProcessor(repo *models.JobRepository) error {
 	GlobalProcessor.ExpireTicker = time.NewTicker(EXPIRE_CHECK_TRESHOLD * time.Second)
 	go func() {
 		for range GlobalProcessor.ExpireTicker.C {
-			for _, value := range GlobalProcessor.Repository.QueueArray {
+			var queueNames = GlobalProcessor.Repository.GetQueueNames()
+			for _, value := range queueNames {
 				q, found := GlobalProcessor.Repository.Queues[value]
 				if found {
 					go CheckExpires(q)
