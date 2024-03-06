@@ -11,6 +11,10 @@ func AddJobCommand(repo *models.JobRepository, cmd string) *models.CommandResult
 	commandParts := strings.Split(cmd, " ")
 	if commandParts[0] != "job-add" {
 		result.Success = false
+		result.Error = models.CommandError{
+			Code:    models.ERROR_INVALID_COMMAND,
+			Message: models.ERROR_INVALID_COMMAND_MSG,
+		}
 	}
 
 	return &result
