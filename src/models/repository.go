@@ -1,6 +1,8 @@
 package models
 
-import "errors"
+import (
+	"errors"
+)
 
 type JobRepository struct {
 	queueArray []string
@@ -46,7 +48,11 @@ func (repo *JobRepository) DeleteQueue(qname string) error {
 }
 
 // Adding new Job
-func (repo *JobRepository) AddJob(qname string, job *Job) error {
+func (repo *JobRepository) AddJob(qname string, data []byte, delay int, expire int) (int, error) {
+	job, err := NewJob(data, delay, expire)
+	if err != nil {
+		return 0, err
+	}
 
-	return nil
+	return job.Id, nil
 }
