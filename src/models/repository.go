@@ -56,3 +56,9 @@ func (repo *JobRepository) AddJob(qname string, data []byte, delay int, expire i
 
 	return job.Id, nil
 }
+
+// Delete new Job
+func (repo *JobRepository) DeleteJob(qname string, jobId int) error {
+
+	return nil
+}
