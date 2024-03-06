@@ -13,12 +13,12 @@ func ListQueueCommand(repo *models.JobRepository, cmd string) *models.CommandRes
 		result.Success = false
 		result.Error = models.CommandError{
 			Code:    models.ERROR_INVALID_COMMAND,
-			Message: "Invalid Command",
+			Message: models.ERROR_INVALID_COMMAND_MSG,
 		}
 	}
 
 	result.Success = true
-	result.Data = strings.Join(repo.QueueArray, "\n")
+	result.Data = strings.Join(repo.GetQueueNames(), "\n")
 
 	return &result
 }

@@ -13,7 +13,7 @@ func AddQueueCommand(repo *models.JobRepository, cmd string) *models.CommandResu
 		result.Success = false
 		result.Error = models.CommandError{
 			Code:    models.ERROR_INVALID_FORMAT,
-			Message: "Invalid Command Format",
+			Message: models.ERROR_INVALID_FORMAT_MSG,
 		}
 		return &result
 	}
@@ -25,7 +25,7 @@ func AddQueueCommand(repo *models.JobRepository, cmd string) *models.CommandResu
 		result.Success = false
 		result.Error = models.CommandError{
 			Code:    models.ERROR_INTERNAL,
-			Message: err.Error(),
+			Message: models.ERROR_INTERNAL_MSG,
 		}
 	} else {
 		result.Success = true
