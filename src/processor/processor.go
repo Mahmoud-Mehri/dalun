@@ -54,7 +54,7 @@ func ProcessCommand(repo *models.JobRepository, cmd *models.Command) {
 		commandResult = commandFunc(repo, cmd.CMD)
 		*cmd.ResultChannel <- *commandResult
 	} else {
-		println("Invalid Command!")
+		println(models.ERROR_INVALID_COMMAND_MSG)
 	}
 }
 
