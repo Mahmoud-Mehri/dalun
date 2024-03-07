@@ -45,7 +45,7 @@ func CheckExpires(q *models.Queue) {
 }
 
 func ProcessCommand(repo *models.JobRepository, cmd *models.Command) {
-	fmt.Println("Processing Command")
+	// fmt.Println("Processing Command")
 	cmdParts := strings.Split(cmd.CMD, " ")
 
 	commandFunc := COMMAND_LIST[cmdParts[0]]
@@ -54,7 +54,16 @@ func ProcessCommand(repo *models.JobRepository, cmd *models.Command) {
 		commandResult = commandFunc(repo, cmd.CMD)
 		*cmd.ResultChannel <- *commandResult
 	} else {
-		println(models.ERROR_INVALID_COMMAND_MSG)
+		commandResult = &models.CommandResult{
+			Success: false,
+			Data:    models.ERROR_INVALID_COMMAND_MSG,
+			Error: models.CommandError{
+				Code:    models.ERROR_INVALID_COMMAND,
+				Message: models.ERROR_INVALID_COMMAND_MSG,
+			},
+		}
+		*cmd.ResultChannel <- *commandResult
+		// println(models.ERROR_INVALID_COMMAND_MSG)
 	}
 }
 
