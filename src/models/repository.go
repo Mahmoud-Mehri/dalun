@@ -49,7 +49,11 @@ func (repo *JobRepository) DeleteQueue(qname string) error {
 
 // Adding new Job
 func (repo *JobRepository) AddJob(qname string, data []byte, delay int, expire int) (int, error) {
-	job, err := NewJob(data, delay, expire)
+	if repo.Queues[qname] == nil {
+		return 0, errors.New(ERROR_QUEUE_NOTFOUND_MSG)
+	}
+
+	job, err := repo.Queues[qname].AddNewJob(data, delay, expire)
 	if err != nil {
 		return 0, err
 	}
