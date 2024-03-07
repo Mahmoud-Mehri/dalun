@@ -26,7 +26,13 @@ type Queue struct {
 }
 
 func NewQueue(name string) (*Queue, error) {
-	queue := Queue{}
+	queue := Queue{
+		Delayed:     map[int]*Job{},
+		Ready:       map[int]*Job{},
+		Reserved:    map[int]*Job{},
+		Ignored:     map[int]*Job{},
+		Subscribers: map[int]*Subscriber{},
+	}
 	queue.Name = name
 
 	return &queue, nil
