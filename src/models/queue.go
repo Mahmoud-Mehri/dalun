@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"sync"
 )
 
@@ -48,4 +49,18 @@ func (q *Queue) AddNewJob(data []byte, delay int, expireAfter int) (*Job, error)
 	}
 
 	return job, nil
+}
+
+func (q *Queue) DeleteJob(id int) error {
+	if q.Ready[id] == nil {
+		if q.Delayed[id] == nil {
+			return errors.New(ERROR_JOB_NOTFOUND_MSG)
+		} else {
+			q.Delayed[id] = nil
+			return nil
+		}
+	}
+
+	q.Ready[id] = nil
+	return nil
 }
