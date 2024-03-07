@@ -44,13 +44,17 @@ func (c *Client) Start() {
 				break
 			}
 
-			textWriter.PrintfLine(result.Data)
-
-			if result.Success {
-				// textWriter.PrintfLine(result.Data)
-			} else {
-				// textWriter.PrintfLine("Error(%d):%s", result.Error.Code, result.Error.Message)
+			if !result.Success {
+				if textproto.TrimString(result.Data) == "" {
+					if result.Error.Code > 0 {
+						result.Data = result.Error.Message
+					} else {
+						result.Data = models.ERROR_INTERNAL_MSG
+					}
+				}
 			}
+
+			textWriter.PrintfLine(result.Data)
 		}
 	}(c)
 
