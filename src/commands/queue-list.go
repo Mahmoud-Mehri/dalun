@@ -11,10 +11,8 @@ func ListQueueCommand(repo *models.JobRepository, cmd string) *models.CommandRes
 	// commandParts := strings.Split(cmd, " ")
 	if cmd != "queue-list" {
 		result.Success = false
-		result.Error = models.CommandError{
-			Code:    models.ERROR_INVALID_COMMAND,
-			Message: models.ERROR_INVALID_COMMAND_MSG,
-		}
+		result.Error = models.NewCommandError(models.ERROR_INVALID_COMMAND, models.ERROR_INVALID_COMMAND_MSG)
+		return &result
 	}
 
 	result.Success = true

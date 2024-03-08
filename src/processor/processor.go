@@ -2,7 +2,6 @@ package processor
 
 import (
 	"dalun/models"
-	"fmt"
 	"strings"
 	"time"
 )
@@ -57,10 +56,7 @@ func ProcessCommand(repo *models.JobRepository, cmd *models.Command) {
 		commandResult = &models.CommandResult{
 			Success: false,
 			Data:    models.ERROR_INVALID_COMMAND_MSG,
-			Error: models.CommandError{
-				Code:    models.ERROR_INVALID_COMMAND,
-				Message: models.ERROR_INVALID_COMMAND_MSG,
-			},
+			Error:   models.NewCommandError(models.ERROR_INVALID_COMMAND, models.ERROR_INVALID_COMMAND_MSG),
 		}
 		*cmd.ResultChannel <- *commandResult
 		// println(models.ERROR_INVALID_COMMAND_MSG)
@@ -75,8 +71,6 @@ func StartProcessor(repo *models.JobRepository) error {
 	GlobalProcessor = &Processor{
 		Repository: repo,
 	}
-
-	fmt.Println("Processor Created")
 
 	// Start Delay Checking Process
 	GlobalProcessor.DelayTicker = time.NewTicker(DELAY_CHECK_TRESHOLD * time.Second)
@@ -106,14 +100,11 @@ func StartProcessor(repo *models.JobRepository) error {
 		}
 	}()
 
-	fmt.Println("Before Command Channel")
-
 	// Start Command Channel
 	GlobalProcessor.CommandChannel = make(chan models.Command)
 	go func() {
-		fmt.Println("Processor Channel Function")
 		for cmd := range GlobalProcessor.CommandChannel {
-			println("Command Received on Processor")
+			println("Command Received on Processor:", cmd.CMD)
 			go ProcessCommand(repo, &cmd)
 		}
 	}()

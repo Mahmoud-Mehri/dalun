@@ -10,7 +10,7 @@ type Job struct {
 	ExpireAfter time.Duration
 }
 
-func NewJob(id uint, data []byte, delay int, expireAfter int) (*Job, error) {
+func NewJob(id uint, data []byte, delay int, expireAfter int) *Job {
 	job := Job{
 		Id: id,
 	}
@@ -18,5 +18,5 @@ func NewJob(id uint, data []byte, delay int, expireAfter int) (*Job, error) {
 	job.Delay = time.Duration(int(time.Second) * delay)
 	job.ExpireAfter = time.Duration(int(time.Second) * expireAfter)
 
-	return &job, nil
+	return &job
 }

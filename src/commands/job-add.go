@@ -12,20 +12,14 @@ func AddJobCommand(repo *models.JobRepository, cmd string) *models.CommandResult
 	commandParts := strings.Split(cmd, " ")
 	if commandParts[0] != "job-add" {
 		result.Success = false
-		result.Error = models.CommandError{
-			Code:    models.ERROR_INVALID_COMMAND,
-			Message: models.ERROR_INVALID_COMMAND_MSG,
-		}
+		result.Error = models.NewCommandError(models.ERROR_INVALID_COMMAND, models.ERROR_INVALID_COMMAND_MSG)
 
 		return &result
 	}
 
 	if len(commandParts) < 5 {
 		result.Success = false
-		result.Error = models.CommandError{
-			Code:    models.ERROR_INVALID_FORMAT,
-			Message: models.ERROR_INVALID_FORMAT_MSG,
-		}
+		result.Error = models.NewCommandError(models.ERROR_INVALID_FORMAT, models.ERROR_INVALID_FORMAT_MSG)
 
 		return &result
 	}
@@ -35,10 +29,7 @@ func AddJobCommand(repo *models.JobRepository, cmd string) *models.CommandResult
 	delay, err := strconv.Atoi(commandParts[2])
 	if err != nil {
 		result.Success = false
-		result.Error = models.CommandError{
-			Code:    models.ERROR_INVALID_FORMAT,
-			Message: models.ERROR_INVALID_FORMAT_MSG,
-		}
+		result.Error = models.NewCommandError(models.ERROR_INVALID_FORMAT, models.ERROR_INVALID_FORMAT_MSG)
 
 		return &result
 	}
@@ -46,22 +37,16 @@ func AddJobCommand(repo *models.JobRepository, cmd string) *models.CommandResult
 	expire, err := strconv.Atoi(commandParts[3])
 	if err != nil {
 		result.Success = false
-		result.Error = models.CommandError{
-			Code:    models.ERROR_INVALID_FORMAT,
-			Message: models.ERROR_INVALID_FORMAT_MSG,
-		}
+		result.Error = models.NewCommandError(models.ERROR_INVALID_FORMAT, models.ERROR_INVALID_FORMAT_MSG)
 
 		return &result
 	}
 
 	var data []byte = []byte(strings.Join(commandParts[4:], " "))
-	jobId, err := repo.AddJob(qname, data, delay, expire)
-	if err != nil {
+	jobId, e := repo.AddJob(qname, data, delay, expire)
+	if e != nil {
 		result.Success = false
-		result.Error = models.CommandError{
-			Code:    models.ERROR_INTERNAL,
-			Message: models.ERROR_INTERNAL_MSG,
-		}
+		result.Error = e
 
 		return &result
 	}

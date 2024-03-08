@@ -10,5 +10,5 @@ type Command struct {
 type CommandResult struct {
 	Success bool
 	Data    string
-	Error   CommandError
+	Error   *CommandError
 }

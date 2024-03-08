@@ -12,20 +12,14 @@ func DelJobCommand(repo *models.JobRepository, cmd string) *models.CommandResult
 	commandParts := strings.Split(cmd, " ")
 	if commandParts[0] == "job-del" {
 		result.Success = false
-		result.Error = models.CommandError{
-			Code:    models.ERROR_INVALID_COMMAND,
-			Message: models.ERROR_INVALID_COMMAND_MSG,
-		}
+		result.Error = models.NewCommandError(models.ERROR_INVALID_COMMAND, models.ERROR_INVALID_COMMAND_MSG)
 
 		return &result
 	}
 
 	if len(commandParts) < 3 {
 		result.Success = false
-		result.Error = models.CommandError{
-			Code:    models.ERROR_INVALID_FORMAT,
-			Message: models.ERROR_INVALID_FORMAT_MSG,
-		}
+		result.Error = models.NewCommandError(models.ERROR_INVALID_FORMAT, models.ERROR_INVALID_FORMAT_MSG)
 
 		return &result
 	}
@@ -35,22 +29,15 @@ func DelJobCommand(repo *models.JobRepository, cmd string) *models.CommandResult
 	jobId, err := strconv.ParseUint(commandParts[2], 10, 32)
 	if err != nil {
 		result.Success = false
-		result.Error = models.CommandError{
-			Code:    models.ERROR_INVALID_FORMAT,
-			Message: models.ERROR_INVALID_FORMAT_MSG,
-		}
+		result.Error = models.NewCommandError(models.ERROR_INVALID_FORMAT, models.ERROR_INVALID_FORMAT_MSG)
 
 		return &result
 	}
 
-	err = repo.DeleteJob(qname, uint(jobId))
-	if err != nil {
+	e := repo.DeleteJob(qname, uint(jobId))
+	if e != nil {
 		result.Success = false
-		result.Error = models.CommandError{
-			Code:    models.ERROR_INTERNAL,
-			Message: models.ERROR_INTERNAL_MSG,
-		}
-
+		result.Error = e
 		return &result
 	}
 

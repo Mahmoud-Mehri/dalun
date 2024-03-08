@@ -9,12 +9,17 @@ func AddQueueCommand(repo *models.JobRepository, cmd string) *models.CommandResu
 	result := models.CommandResult{}
 
 	commandParts := strings.Split(cmd, " ")
-	if !((len(commandParts) == 2) && (commandParts[0] == "queue-add")) {
+	if commandParts[0] != "queue-add" {
 		result.Success = false
-		result.Error = models.CommandError{
-			Code:    models.ERROR_INVALID_FORMAT,
-			Message: models.ERROR_INVALID_FORMAT_MSG,
-		}
+		result.Error = models.NewCommandError(models.ERROR_INVALID_COMMAND, models.ERROR_INVALID_COMMAND_MSG)
+
+		return &result
+	}
+
+	if len(commandParts) != 2 {
+		result.Success = false
+		result.Error = models.NewCommandError(models.ERROR_INVALID_FORMAT, models.ERROR_INVALID_FORMAT_MSG)
+
 		return &result
 	}
 
@@ -23,10 +28,7 @@ func AddQueueCommand(repo *models.JobRepository, cmd string) *models.CommandResu
 	err := repo.AddQueue(queueName)
 	if err != nil {
 		result.Success = false
-		result.Error = models.CommandError{
-			Code:    models.ERROR_INTERNAL,
-			Message: models.ERROR_INTERNAL_MSG,
-		}
+		result.Error = err
 	} else {
 		result.Success = true
 		result.Data = queueName

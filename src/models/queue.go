@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"sync"
 )
 
@@ -26,7 +25,7 @@ type Queue struct {
 	Subscribers      map[uint]*Subscriber
 }
 
-func NewQueue(name string) (*Queue, error) {
+func NewQueue(name string) *Queue {
 	queue := Queue{
 		LastJobId:   0,
 		Delayed:     map[uint]*Job{},
@@ -37,15 +36,18 @@ func NewQueue(name string) (*Queue, error) {
 	}
 	queue.Name = name
 
-	return &queue, nil
+	return &queue
 }
 
-func (q *Queue) AddNewJob(data []byte, delay int, expireAfter int) (*Job, error) {
+func (q *Queue) AddNewJob(data []byte, delay int, expireAfter int) (Job *Job, Err *CommandError) {
+	defer func() {
+		if err := recover(); err != nil {
+			Err = NewCommandError(ERROR_INTERNAL, ERROR_INTERNAL_MSG)
+		}
+	}()
+
 	newJobId := q.LastJobId + 1
-	job, err := NewJob(newJobId, data, delay, expireAfter)
-	if err != nil {
-		return nil, err
-	}
+	job := NewJob(newJobId, data, delay, expireAfter)
 
 	if job.Delay > 0 {
 		q.DelayLocker.Lock()
@@ -60,10 +62,16 @@ func (q *Queue) AddNewJob(data []byte, delay int, expireAfter int) (*Job, error)
 	return job, nil
 }
 
-func (q *Queue) DeleteJob(id uint) error {
+func (q *Queue) DeleteJob(id uint) (Err *CommandError) {
+	defer func() {
+		if err := recover(); err != nil {
+			Err = NewCommandError(ERROR_INTERNAL, ERROR_INTERNAL_MSG)
+		}
+	}()
+
 	if q.Ready[id] == nil {
 		if q.Delayed[id] == nil {
-			return errors.New(ERROR_JOB_NOTFOUND_MSG)
+			return NewCommandError(ERROR_JOB_NOTFOUND, ERROR_JOB_NOTFOUND_MSG)
 		} else {
 			q.Delayed[id] = nil
 			return nil

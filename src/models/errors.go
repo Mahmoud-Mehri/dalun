@@ -1,8 +1,21 @@
 package models
 
+import "fmt"
+
 type CommandError struct {
 	Code    int
 	Message string
+}
+
+func (e CommandError) Error() string {
+	return fmt.Sprintf("Error: %d - %s", e.Code, e.Message)
+}
+
+func NewCommandError(code int, msg string) *CommandError {
+	return &CommandError{
+		Code:    code,
+		Message: msg,
+	}
 }
 
 const (

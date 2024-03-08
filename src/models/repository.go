@@ -1,9 +1,5 @@
 package models
 
-import (
-	"errors"
-)
-
 type JobRepository struct {
 	queueArray []string
 	Queues     map[string]*Queue
@@ -15,11 +11,12 @@ func (repo *JobRepository) GetQueueNames() []string {
 }
 
 // Adding new Queue
-func (repo *JobRepository) AddQueue(qname string) error {
-	q, err := NewQueue(qname)
-	if err != nil {
-		return err
+func (repo *JobRepository) AddQueue(qname string) *CommandError {
+	if repo.Queues[qname] != nil {
+		return NewCommandError(ERROR_QUEUE_DUPLICATE, ERROR_QUEUE_DUPLICATE_MSG)
 	}
+
+	q := NewQueue(qname)
 
 	println("Queue Created:", qname)
 
@@ -31,7 +28,7 @@ func (repo *JobRepository) AddQueue(qname string) error {
 	return nil
 }
 
-func (repo *JobRepository) DeleteQueue(qname string) error {
+func (repo *JobRepository) DeleteQueue(qname string) *CommandError {
 	if repo.Queues[qname] != nil {
 		delete(repo.Queues, qname)
 		for i, val := range repo.queueArray {
@@ -44,13 +41,13 @@ func (repo *JobRepository) DeleteQueue(qname string) error {
 		return nil
 	}
 
-	return errors.New(ERROR_QUEUE_NOTFOUND_MSG)
+	return NewCommandError(ERROR_QUEUE_NOTFOUND, ERROR_QUEUE_NOTFOUND_MSG)
 }
 
 // Adding new Job
-func (repo *JobRepository) AddJob(qname string, data []byte, delay int, expire int) (uint, error) {
+func (repo *JobRepository) AddJob(qname string, data []byte, delay int, expire int) (uint, *CommandError) {
 	if repo.Queues[qname] == nil {
-		return 0, errors.New(ERROR_QUEUE_NOTFOUND_MSG)
+		return 0, NewCommandError(ERROR_QUEUE_NOTFOUND, ERROR_QUEUE_NOTFOUND_MSG)
 	}
 
 	job, err := repo.Queues[qname].AddNewJob(data, delay, expire)
@@ -62,9 +59,9 @@ func (repo *JobRepository) AddJob(qname string, data []byte, delay int, expire i
 }
 
 // Delete Job
-func (repo *JobRepository) DeleteJob(qname string, jobId uint) error {
+func (repo *JobRepository) DeleteJob(qname string, jobId uint) *CommandError {
 	if repo.Queues[qname] == nil {
-		return errors.New(ERROR_QUEUE_NOTFOUND_MSG)
+		return NewCommandError(ERROR_QUEUE_NOTFOUND, ERROR_QUEUE_NOTFOUND_MSG)
 	}
 
 	err := repo.Queues[qname].DeleteJob(jobId)
