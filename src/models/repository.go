@@ -48,7 +48,7 @@ func (repo *JobRepository) DeleteQueue(qname string) error {
 }
 
 // Adding new Job
-func (repo *JobRepository) AddJob(qname string, data []byte, delay int, expire int) (int, error) {
+func (repo *JobRepository) AddJob(qname string, data []byte, delay int, expire int) (uint, error) {
 	if repo.Queues[qname] == nil {
 		return 0, errors.New(ERROR_QUEUE_NOTFOUND_MSG)
 	}
@@ -62,7 +62,7 @@ func (repo *JobRepository) AddJob(qname string, data []byte, delay int, expire i
 }
 
 // Delete Job
-func (repo *JobRepository) DeleteJob(qname string, jobId int) error {
+func (repo *JobRepository) DeleteJob(qname string, jobId uint) error {
 	if repo.Queues[qname] == nil {
 		return errors.New(ERROR_QUEUE_NOTFOUND_MSG)
 	}
