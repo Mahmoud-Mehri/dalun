@@ -67,7 +67,7 @@ func AddJobCommand(repo *models.JobRepository, cmd string) *models.CommandResult
 	}
 
 	result.Success = true
-	result.Data = strconv.Itoa(jobId)
+	result.Data = strconv.FormatUint(uint64(jobId), 10)
 
 	return &result
 }

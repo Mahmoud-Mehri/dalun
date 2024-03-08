@@ -32,7 +32,7 @@ func DelJobCommand(repo *models.JobRepository, cmd string) *models.CommandResult
 
 	qname := commandParts[1]
 
-	jobId, err := strconv.Atoi(commandParts[2])
+	jobId, err := strconv.ParseUint(commandParts[2], 10, 32)
 	if err != nil {
 		result.Success = false
 		result.Error = models.CommandError{
@@ -43,7 +43,7 @@ func DelJobCommand(repo *models.JobRepository, cmd string) *models.CommandResult
 		return &result
 	}
 
-	err = repo.DeleteJob(qname, jobId)
+	err = repo.DeleteJob(qname, uint(jobId))
 	if err != nil {
 		result.Success = false
 		result.Error = models.CommandError{
@@ -55,7 +55,7 @@ func DelJobCommand(repo *models.JobRepository, cmd string) *models.CommandResult
 	}
 
 	result.Success = true
-	result.Data = strconv.Itoa(jobId)
+	result.Data = strconv.FormatUint(jobId, 10)
 
 	return &result
 }
