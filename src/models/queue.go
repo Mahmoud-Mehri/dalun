@@ -6,32 +6,34 @@ import (
 )
 
 type Queue struct {
-	Id   int
-	Name string
+	Id        uint
+	Name      string
+	LastJobId uint
 
 	DelayLocker sync.Mutex
-	Delayed     map[int]*Job
+	Delayed     map[uint]*Job
 
 	ReadyLocker sync.Mutex
-	Ready       map[int]*Job
+	Ready       map[uint]*Job
 
 	ReservedLocker sync.Mutex
-	Reserved       map[int]*Job
+	Reserved       map[uint]*Job
 
 	IgnoredLocker sync.Mutex
-	Ignored       map[int]*Job
+	Ignored       map[uint]*Job
 
 	SubscriberLocker sync.Mutex
-	Subscribers      map[int]*Subscriber
+	Subscribers      map[uint]*Subscriber
 }
 
 func NewQueue(name string) (*Queue, error) {
 	queue := Queue{
-		Delayed:     map[int]*Job{},
-		Ready:       map[int]*Job{},
-		Reserved:    map[int]*Job{},
-		Ignored:     map[int]*Job{},
-		Subscribers: map[int]*Subscriber{},
+		LastJobId:   0,
+		Delayed:     map[uint]*Job{},
+		Ready:       map[uint]*Job{},
+		Reserved:    map[uint]*Job{},
+		Ignored:     map[uint]*Job{},
+		Subscribers: map[uint]*Subscriber{},
 	}
 	queue.Name = name
 
@@ -39,7 +41,8 @@ func NewQueue(name string) (*Queue, error) {
 }
 
 func (q *Queue) AddNewJob(data []byte, delay int, expireAfter int) (*Job, error) {
-	job, err := NewJob(data, delay, expireAfter)
+	newJobId := q.LastJobId + 1
+	job, err := NewJob(newJobId, data, delay, expireAfter)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +60,7 @@ func (q *Queue) AddNewJob(data []byte, delay int, expireAfter int) (*Job, error)
 	return job, nil
 }
 
-func (q *Queue) DeleteJob(id int) error {
+func (q *Queue) DeleteJob(id uint) error {
 	if q.Ready[id] == nil {
 		if q.Delayed[id] == nil {
 			return errors.New(ERROR_JOB_NOTFOUND_MSG)
